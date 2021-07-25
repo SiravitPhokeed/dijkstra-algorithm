@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <queue>
 
 using namespace std;
 
@@ -29,7 +30,9 @@ public:
 	vector<link> linkTo;
 	double value;
 	int PrevIndex;
-	node(string MyName) { name = MyName; }
+	int status; // 0 is unexplored 1 is explored 2 exploring
+	float timeTake; // total time it take to go to each town 
+	node(string MyName) { name = MyName; status=0; timeTake=2147483647;}
 	~node() { linkTo.clear(); }
 	string Name() { return name; }
 	void SetLink(int linkIndex, double weight); //Explain in Graph.cpp.
@@ -48,6 +51,7 @@ public:
 	bool AddNode(string name);								   //Explain in Graph.cpp.
 	bool AddLink(int BeginIndex, int EndIndex, double weight); //Explain in Graph.cpp.
 	int IndexOf(string Name);								   //Explain in Graph.cpp.
+	string shortestPath(string start, string end);
 protected:
 };
 
@@ -189,6 +193,51 @@ int Graph::IndexOf(string Name)
 	}
 	return result;
 }
+void showq(queue<node> gq)
+{
+    queue<int> g = gq;
+    while (!g.empty()) {
+        cout << '\t' << g.front();
+        g.pop();
+    }
+    cout << '\n';
+}
+
+string Graph::shortestPath(string start, string end){
+	if (start == end) {
+		return "";
+	}
+	queue<node> path;
+	string shortestString = "";
+	int startIndex = IndexOf(start);
+	int endIndex = IndexOf(end);
+	// cout << startIndex << endl; // debug
+	// cout << endIndex << endl;  // debug
+	nodeList[startIndex].status = 1;
+	nodeList[0].timeTake = 0;
+	path.push(nodeList[0]);
+	vector<link> unexploredVector = nodeList[startIndex].linkTo;
+	for (int i=0; i<unexploredVector.size(); i++) {
+		// cout << unexploredVector[i].index << endl;  // debug
+		// cout << unexploredVector[i].weight << endl;  // debug
+		int currentNode = unexploredVector[i].index;
+		if (nodeList[currentNode].status == 0 || nodeList[currentNode].status == 2) {
+			nodeList[currentNode].status = 2;  // set nodes to exploring
+			if (nodeList[startIndex].timeTake + unexploredVector[i].weight < nodeList[currentNode].timeTake) {
+				// cout << nodeList[currentNode].Name() << endl;  // debug
+				// cout << nodeList[startIndex].timeTake << " + " << unexploredVector[i].weight << endl;
+				nodeList[currentNode].timeTake = nodeList[startIndex].timeTake + unexploredVector[i].weight;  // set time take to node
+				path.push(nodeList[currentNode])
+			}
+			cout << nodeList[startIndex].Name() << " -> " << nodeList[currentNode].Name() << "\t"<< nodeList[currentNode].timeTake << endl;
+			shortestPath(nodeList[currentNode].Name(), end);
+		}
+		
+	}
+	showq(path);
+	return shortestString;
+}
+
 //------------------ private Method --------------------
 
 string Graph::ErrorCase(int e)
