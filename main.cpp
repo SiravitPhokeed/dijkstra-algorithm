@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 			cin >> StartNode;
 			cout << "end node =";
 			cin >> EndNode;
-			cout << "a -> b -> d" << endl;
+			// cout << "a -> b -> d" << endl;
 			MyGraph.shortestPath(StartNode, EndNode);
 		}
 		else if (cmd == "help")

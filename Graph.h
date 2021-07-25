@@ -51,6 +51,7 @@ public:
 	bool AddNode(string name);								   //Explain in Graph.cpp.
 	bool AddLink(int BeginIndex, int EndIndex, double weight); //Explain in Graph.cpp.
 	int IndexOf(string Name);								   //Explain in Graph.cpp.
+	vector<node> shortPath;
 	string shortestPath(string start, string end);
 protected:
 };
@@ -193,29 +194,30 @@ int Graph::IndexOf(string Name)
 	}
 	return result;
 }
-void showq(queue<node> gq)
-{
-    queue<int> g = gq;
-    while (!g.empty()) {
-        cout << '\t' << g.front();
-        g.pop();
-    }
-    cout << '\n';
-}
 
 string Graph::shortestPath(string start, string end){
-	if (start == end) {
-		return "";
-	}
-	queue<node> path;
-	string shortestString = "";
+	// vector<node> path;
 	int startIndex = IndexOf(start);
 	int endIndex = IndexOf(end);
 	// cout << startIndex << endl; // debug
+	if (start == end) {
+		// shortPath.push_back(nodeList[endIndex]);
+		string shortestString = "";
+		for (int i=0; i<shortPath.size(); i++){
+			shortestString += shortPath[i].Name();
+			if (i < (shortPath.size() - 1)) {
+				shortestString += " -> ";
+			} else {
+				shortestString += "\n";
+			}
+		}
+		cout << shortestString;
+		return shortestString;
+	}
 	// cout << endIndex << endl;  // debug
 	nodeList[startIndex].status = 1;
 	nodeList[0].timeTake = 0;
-	path.push(nodeList[0]);
+	shortPath.push_back(nodeList[startIndex]);
 	vector<link> unexploredVector = nodeList[startIndex].linkTo;
 	for (int i=0; i<unexploredVector.size(); i++) {
 		// cout << unexploredVector[i].index << endl;  // debug
@@ -227,15 +229,14 @@ string Graph::shortestPath(string start, string end){
 				// cout << nodeList[currentNode].Name() << endl;  // debug
 				// cout << nodeList[startIndex].timeTake << " + " << unexploredVector[i].weight << endl;
 				nodeList[currentNode].timeTake = nodeList[startIndex].timeTake + unexploredVector[i].weight;  // set time take to node
-				path.push(nodeList[currentNode])
 			}
-			cout << nodeList[startIndex].Name() << " -> " << nodeList[currentNode].Name() << "\t"<< nodeList[currentNode].timeTake << endl;
+			else shortPath.pop_back();
+			// cout << nodeList[startIndex].Name() << " -> " << nodeList[currentNode].Name() << "\t"<< nodeList[currentNode].timeTake << endl; //debug
 			shortestPath(nodeList[currentNode].Name(), end);
 		}
-		
 	}
-	showq(path);
-	return shortestString;
+	shortPath.push_back(nodeList[endIndex]);
+	return ""; // idk why this work but it has to be here
 }
 
 //------------------ private Method --------------------
